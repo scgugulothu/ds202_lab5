@@ -120,3 +120,92 @@ accGlcState.map %>% filter(MONTH==12) %>%
 ```
 
 Overall it appears that slightly more accidents occur in a summer month like June compared to a winter month like December (note the scale goes to 100 in June but only 90 in December). That being said, states have about the same number of accidents comparative to other states regardless of the season. (Texas has many more accidents than other states regardless of the month.)
+
+
+
+
+
+#Sai Gugulothu
+
+---
+title: "lab5"
+author: "Sai Gugulothu"
+date: "4/18/2019"
+output: html_document
+---
+
+```{r}
+acc <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/accident.csv", stringsAsFactors = FALSE)
+names(acc)
+per <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/fars2017/person.csv", stringsAsFactors = FALSE)
+names(acc)
+
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(tidyverse)
+```
+Part1: Accident Data 
+Question: are there some days of the week where more accidents happen than on others (use variable DAY_WEEK)?
+
+I used ggplot to answer the question and you can see that most accidents happen on Fridays and the weekend. 
+
+```{r}
+ggplot(data = acc, aes(x=DAY_WEEK)) + geom_histogram(color="black", fill="yellow") + ylab("Total Accidents") + xlab("Day of the Week") + scale_x_continuous(breaks=c(1, 2, 3, 4, 5, 6, 7),labels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))+ggtitle("Accidents that Occur on Different Days of Week")
+
+
+
+
+```
+
+Question: What time of the day do accidents happen (use variable HOUR)?
+
+For this question I also used ggplot to plot a bar chart. You can see form the graph that there are more accident in the evening hours from around 6PM-7PM ish.  
+
+```{r}
+ggplot(acc, aes(x=factor(HOUR))) + geom_bar(colour = "black", fill = "blue") + xlim(c(0, 23))  + scale_x_discrete(name ="Time of day (hours)", limits=1:23)
+
+```
+
+
+Question: What is the number of accidents with at least one drunk driver (use variable DRUNK_DR)?
+
+There are 8769 accidents with at least one drunk driver. 
+
+
+```{r}
+sum(acc$DRUNK_DR >= 1)
+```
+
+Part 2: Connecting data
+
+```{r}
+drive <- per %>% filter(PER_TYP==1)
+joined <- inner_join(acc, drive, by="ST_CASE")
+joined$SEX[joined$SEX %in% c(8,9)] <- NA
+joined$SEX <- factor(joined$SEX)
+levels(joined$SEX) <- c("MALE", "FEMALE")
+joined <- filter(joined)
+ggplot(joined, aes(x=HOUR.x, fill=SEX)) + geom_bar()  + xlab("Hours") + ylab("Number of People") + ggtitle("Accidents Grouped by Stats") + facet_grid(DAY_WEEK~.)
+
+
+```
+
+
+Tally the number of accidents by day of the week (DAY_WEEK), hour of the day (HOUR) and gender (SEX). Visualize the results!
+
+
+Part 3: Connecting data and make maps 
+
+```{r}
+#us <- readxl::read_xlsx("FRPP GLC United States.xlsx")
+#territories <- readxl::read_xlsx("FRPP GLC US Territories.xlsx")
+
+
+```
+
+
+
